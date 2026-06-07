@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js"></script>
+<style>
+*{font-family:"Plus Jakarta Sans",sans-serif;box-sizing:border-box}
+body{background:#f8fafc;margin:0;padding:0}
+.lbl{display:block;font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.inp{width:100%;padding:9px 12px;font-size:13px;color:#1e293b;background:white;border:1.5px solid #e2e8f0;border-radius:10px;outline:none;transition:all .2s}
+.inp:focus{border-color:#0ea5e9;box-shadow:0 0 0 3px rgba(14,165,233,.12)}
+.inp::placeholder{color:#94a3b8}
+.inp.id-field{font-family:"JetBrains Mono",monospace;color:#0f766e;font-weight:600}
+.btn-main{background:linear-gradient(135deg,#0f766e,#0ea5e9);color:white;border:none;border-radius:12px;padding:11px;font-size:13px;font-weight:700;width:100%;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-main:hover{opacity:.9;transform:translateY(-1px)}
+.btn-main:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.btn-sm{background:white;color:#475569;border:1.5px solid #e2e8f0;border-radius:9px;padding:7px 12px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+.btn-sm:hover{border-color:#94a3b8}
+.btn-init{background:#f0fdf4;border:1.5px solid #86efac;color:#166534;border-radius:10px;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-init:hover{background:#dcfce7}
+.sec-badge{width:20px;height:20px;background:linear-gradient(135deg,#0f766e,#0ea5e9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0}
+.ok-card{background:linear-gradient(135deg,#ecfdf5,#d1fae5);border:1.5px solid #6ee7b7;border-radius:14px;padding:16px}
+.err-card{background:#fef2f2;border:1.5px solid #fca5a5;border-radius:11px;padding:11px 13px}
+.loading-card{background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:11px;padding:11px 13px}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:8px}
+</style>
+</head>
+<body class="p-3">
+
+<div class="flex items-center gap-2.5 mb-4">
+  <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background:linear-gradient(135deg,#0f766e,#0ea5e9)">
+    <i class="ph-bold ph-file-plus text-white text-lg"></i>
+  </div>
+  <div>
+    <p class="font-bold text-sm text-slate-800">Input Surat Baru</p>
+    <p class="text-xs text-slate-400">Tambah ke database Sheet1</p>
+  </div>
+</div>
+
+<button class="btn-init mb-4" onclick="doInit()">
+  <i class="ph ph-table text-sm"></i> Inisialisasi Sheet1 & Sheet2
+</button>
+
+<div id="notif" class="mb-3"></div>
+
+<div id="formWrap">
+  <div class="flex items-center gap-2 mb-3">
+    <div class="sec-badge">1</div>
+    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Identitas Surat</p>
+  </div>
+
+  <div class="mb-3">
+    <label class="lbl">ID Surat <span class="text-red-500">*</span></label>
+    <div class="flex gap-2">
+      <input type="text" id="fId" placeholder="SK-001-2025" class="inp id-field flex-1" oninput="clrErr()"/>
+      <button class="btn-sm" onclick="autoId()"><i class="ph ph-magic-wand text-sm"></i>Auto</button>
+    </div>
+    <p class="text-slate-400 text-xs mt-1">Contoh: SK-001-2025, SPT-007-2025</p>
+  </div>
+
+  <div class="mb-3">
+    <label class="lbl">Nomor Surat <span class="text-red-500">*</span></label>
+    <input type="text" id="fNomor" placeholder="001/AWM/V/2025" class="inp" oninput="clrErr()"/>
+  </div>
+
+  <div class="mb-4">
+    <label class="lbl">Perihal <span class="text-red-500">*</span></label>
+    <input type="text" id="fPerihal" placeholder="Surat Keputusan Pengangkatan" class="inp" oninput="clrErr()"/>
+  </div>
+
+  <div class="border-t border-dashed border-slate-200 my-4"></div>
+
+  <div class="flex items-center gap-2 mb-3">
+    <div class="sec-badge">2</div>
+    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Penandatangan</p>
+  </div>
+
+  <div class="mb-3">
+    <label class="lbl">Nama Penandatangan <span class="text-red-500">*</span></label>
+    <input type="text" id="fNama" placeholder="Dr. Budi Santoso, M.Si" class="inp" oninput="clrErr()"/>
+  </div>
+
+  <div class="grid grid-cols-2 gap-2 mb-4">
+    <div>
+      <label class="lbl">Jabatan <span class="text-red-500">*</span></label>
+      <input type="text" id="fJabatan" placeholder="Direktur" class="inp" oninput="clrErr()"/>
+    </div>
+    <div>
+      <label class="lbl">Unit <span class="text-red-500">*</span></label>
+      <input type="text" id="fUnit" placeholder="Awaremind" class="inp" oninput="clrErr()"/>
+    </div>
+  </div>
+
+  <div class="border-t border-dashed border-slate-200 my-4"></div>
+
+  <div class="flex items-center gap-2 mb-3">
+    <div class="sec-badge">3</div>
+    <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Waktu</p>
+  </div>
+
+  <div class="mb-5">
+    <label class="lbl">Waktu Penandatanganan <span class="text-red-500">*</span></label>
+    <div class="flex gap-2">
+      <input type="text" id="fWaktu" placeholder="1 Juni 2025, 09.30 WIB" class="inp flex-1" oninput="clrErr()"/>
+      <button class="btn-sm" onclick="fillNow()"><i class="ph ph-clock text-sm"></i>Kini</button>
+    </div>
+  </div>
+
+  <button class="btn-main" onclick="submit()" id="btnSub">
+    <i class="ph-bold ph-floppy-disk text-base" id="icoSub"></i>
+    <span id="lblSub">Simpan & Generate QR</span>
+  </button>
+  <p class="text-center text-slate-400 text-xs mt-2"><span class="text-red-400">*</span> wajib diisi</p>
+</div>
+
+<div id="result" class="hidden mt-4">
+  <div class="ok-card">
+    <div class="flex items-center gap-2 mb-3">
+      <div class="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center"><i class="ph-bold ph-check text-white"></i></div>
+      <div>
+        <p class="font-bold text-sm text-emerald-800">Surat Berhasil Disimpan!</p>
+        <p class="text-xs text-emerald-600" id="rRow"></p>
+      </div>
+    </div>
+    <div class="flex justify-center mb-3">
+      <div style="border:2px solid #d1fae5;border-radius:10px;padding:8px;background:white">
+        <img id="rQr" src="" alt="QR" class="w-36 h-36"/>
+      </div>
+    </div>
+    <div class="bg-white rounded-xl p-3 mb-3 border border-emerald-100">
+      <p class="text-xs font-bold text-slate-400 mb-1">URL Verifikasi:</p>
+      <p class="text-xs break-all text-slate-600" style="font-family:'JetBrains Mono',monospace" id="rUrl"></p>
+    </div>
+    <div class="flex gap-2">
+      <a id="rOpen" href="#" target="_blank" class="flex-1 btn-sm justify-center no-underline text-xs">
+        <i class="ph ph-arrow-square-out text-sm"></i> Buka Portal
+      </a>
+      <a id="rDl" href="#" download class="flex-1 btn-main text-xs py-2 no-underline justify-center" style="border-radius:10px">
+        <i class="ph-bold ph-download-simple text-sm"></i> Unduh QR
+      </a>
+    </div>
+    <button onclick="reset()" class="mt-3 w-full btn-sm justify-center text-xs">
+      <i class="ph ph-plus text-sm"></i> Input Surat Berikutnya
+    </button>
+  </div>
+</div>
+
+<script>
+function fillNow(){
+  var d=new Date(),m=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+  var h=String(d.getHours()).padStart(2,'0'),mn=String(d.getMinutes()).padStart(2,'0');
+  document.getElementById('fWaktu').value=d.getDate()+' '+m[d.getMonth()]+' '+d.getFullYear()+', '+h+'.'+mn+' WIB';
+}
+function autoId(){
+  google.script.run.withSuccessHandler(function(r){document.getElementById('fId').value=r.id;}).generateAutoId();
+}
+function doInit(){
+  setNotif('load','Menginisialisasi...');
+  google.script.run.withSuccessHandler(function(){setNotif('ok','Sheet1 & Sheet2 siap!');setTimeout(function(){document.getElementById('notif').innerHTML='';},3000);}).initAllSheets();
+}
+function clrErr(){
+  var n=document.getElementById('notif');
+  if(n.innerHTML.indexOf('err')!==-1)n.innerHTML='';
+}
+function setNotif(t,msg){
+  var n=document.getElementById('notif');
+  if(t==='load')n.innerHTML='<div class="loading-card flex items-center gap-2"><i class="ph ph-circle-notch text-blue-500 text-sm" style="animation:spin 1s linear infinite"></i><p class="text-blue-700 text-xs">'+msg+'</p></div>';
+  else if(t==='err')n.innerHTML='<div class="err-card flex items-start gap-2"><i class="ph ph-warning-circle text-red-400 text-base flex-shrink-0"></i><p class="text-red-700 text-xs">'+msg+'</p></div>';
+  else if(t==='ok')n.innerHTML='<div class="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2.5"><i class="ph ph-check-circle text-emerald-500 text-sm"></i><p class="text-emerald-700 text-xs font-semibold">'+msg+'</p></div>';
+}
+function setLoad(on){
+  document.getElementById('btnSub').disabled=on;
+  document.getElementById('icoSub').className=on?'ph ph-circle-notch text-base':'ph-bold ph-floppy-disk text-base';
+  document.getElementById('lblSub').textContent=on?'Menyimpan...':'Simpan & Generate QR';
+}
+function validate(){
+  var fs=[{id:'fId',n:'ID Surat'},{id:'fNomor',n:'Nomor Surat'},{id:'fPerihal',n:'Perihal'},
+          {id:'fNama',n:'Nama Penandatangan'},{id:'fJabatan',n:'Jabatan'},{id:'fUnit',n:'Unit'},{id:'fWaktu',n:'Waktu TTD'}];
+  for(var i=0;i<fs.length;i++){
+    if(!document.getElementById(fs[i].id).value.trim()){
+      setNotif('err',fs[i].n+' wajib diisi.');
+      document.getElementById(fs[i].id).focus();
+      return false;
+    }
+  }
+  return true;
+}
+function submit(){
+  if(!validate())return;
+  setLoad(true);
+  var f={
+    id:document.getElementById('fId').value.trim(),
+    nomorSurat:document.getElementById('fNomor').value.trim(),
+    perihal:document.getElementById('fPerihal').value.trim(),
+    nama:document.getElementById('fNama').value.trim(),
+    jabatan:document.getElementById('fJabatan').value.trim(),
+    unit:document.getElementById('fUnit').value.trim(),
+    waktuTtd:document.getElementById('fWaktu').value.trim()
+  };
+  google.script.run
+    .withSuccessHandler(function(r){
+      setLoad(false);
+      if(r.error){setNotif('err',r.error);return;}
+      var dl='https://api.qrserver.com/v1/create-qr-code/?size=800x800&margin=20&format=png&data='+encodeURIComponent(r.portalUrl);
+      document.getElementById('rRow').textContent='Baris '+r.rowNumber+' · Sheet1';
+      document.getElementById('rQr').src=r.qrUrl;
+      document.getElementById('rUrl').textContent=r.portalUrl;
+      document.getElementById('rOpen').href=r.portalUrl;
+      document.getElementById('rDl').href=dl;
+      document.getElementById('rDl').download='QR_'+f.id+'.png';
+      document.getElementById('formWrap').classList.add('hidden');
+      document.getElementById('result').classList.remove('hidden');
+    })
+    .withFailureHandler(function(e){setLoad(false);setNotif('err',e.message);})
+    .tambahDataSurat(f);
+}
+function reset(){
+  ['fId','fNomor','fPerihal','fNama','fJabatan','fUnit','fWaktu'].forEach(function(x){document.getElementById(x).value='';});
+  document.getElementById('formWrap').classList.remove('hidden');
+  document.getElementById('result').classList.add('hidden');
+  document.getElementById('notif').innerHTML='';
+  fillNow();autoId();
+}
+window.onload=function(){fillNow();autoId();};
+</script>
+</body>
+</html>
