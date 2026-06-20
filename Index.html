@@ -1,5 +1,4 @@
-Saya akan mulai membangun mahakarya ini. Karena ini file HTML tunggal yang sangat kompleks, saya akan membuatnya secara strategis - dense, performant, dan visually stunning.
-Action: file_editor create /app/semendo_dashboard.html --file-text "<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang=\"id\">
 <head>
 <meta charset=\"UTF-8\" />
